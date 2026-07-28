@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
-import { getAllFontFiles, getSystemVersion } from '../../lib/fontsStorage';
+import { getAllFontFiles, getSystemVersion } from '@/lib/fontsStorage';
 
 export async function GET() {
   const allFiles = getAllFontFiles();

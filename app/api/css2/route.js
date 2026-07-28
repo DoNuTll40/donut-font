@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
-import { getAllFontFiles } from '../../lib/fontsStorage';
+import { getAllFontFiles } from '@/lib/fontsStorage';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -58,7 +58,6 @@ export async function GET(request) {
 
         const isItalic = file.toLowerCase().includes('italic');
 
-        // Font file serve URL: if file is in /tmp or public, serve via /api/download?file=...
         const fontFileServeUrl = `${baseUrl}/api/download?file=${encodeURIComponent(file)}`;
 
         cssOutput += `@font-face {\n`;

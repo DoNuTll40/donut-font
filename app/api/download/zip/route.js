@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
-import { getAllFontFiles, getSystemVersion } from '../../../lib/fontsStorage';
+import { getAllFontFiles, getSystemVersion } from '@/lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

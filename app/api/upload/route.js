@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import path from 'path';
-import { writeFontFile } from '../../../lib/fontsStorage';
+import { writeFontFile } from '@/lib/fontsStorage';
 
 export async function POST(request) {
   try {

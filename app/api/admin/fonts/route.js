@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllFontFiles, deleteFontFile, saveSystemVersion } from '../../../lib/fontsStorage';
+import { getAllFontFiles, deleteFontFile, saveSystemVersion } from '@/lib/fontsStorage';
 
 const REQUIRED_PIN = '001140';
 

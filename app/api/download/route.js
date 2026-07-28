@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getAllFontFiles } from '../../lib/fontsStorage';
+import { getAllFontFiles } from '@/lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
