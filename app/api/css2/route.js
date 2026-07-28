@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
+import { getAllFontFiles } from '../../lib/fontsStorage';
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -32,30 +32,23 @@ export async function GET(request) {
   const protocol = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
   const baseUrl = `${protocol}://${host}`;
 
-  let cssOutput = `/* Private Thai Font Vault API - 100% Hosted Private Fonts */\n\n`;
+  let cssOutput = `/* Private Thai Font Vault API - Serverless Vercel Engine */\n\n`;
 
-  const fontsDir = path.join(process.cwd(), 'public', 'fonts');
-  let localFiles = [];
-  try {
-    if (fs.existsSync(fontsDir)) {
-      localFiles = fs.readdirSync(fontsDir);
-    }
-  } catch (err) {
-    console.error('Error reading fonts directory:', err);
-  }
+  const allFontFiles = getAllFontFiles();
 
   for (const familyStr of familyParams) {
     const [rawFamilyName] = familyStr.split(':');
     const familyName = rawFamilyName.replace(/\+/g, ' ');
     const normalizedFamily = familyName.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    const matchedLocalFiles = localFiles.filter(filename => {
-      const normFile = filename.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const matchedLocalFiles = allFontFiles.filter(fileObj => {
+      const normFile = fileObj.filename.toLowerCase().replace(/[^a-z0-9]/g, '');
       return normFile.includes(normalizedFamily);
     });
 
     if (matchedLocalFiles.length > 0) {
-      matchedLocalFiles.forEach(file => {
+      matchedLocalFiles.forEach(fileObj => {
+        const file = fileObj.filename;
         const ext = path.extname(file).replace('.', '').toLowerCase();
         const format = ext === 'woff2' ? 'woff2' : ext === 'woff' ? 'woff' : 'truetype';
         
@@ -65,12 +58,15 @@ export async function GET(request) {
 
         const isItalic = file.toLowerCase().includes('italic');
 
+        // Font file serve URL: if file is in /tmp or public, serve via /api/download?file=...
+        const fontFileServeUrl = `${baseUrl}/api/download?file=${encodeURIComponent(file)}`;
+
         cssOutput += `@font-face {\n`;
         cssOutput += `  font-family: '${familyName}';\n`;
         cssOutput += `  font-style: ${isItalic ? 'italic' : 'normal'};\n`;
         cssOutput += `  font-weight: ${fileWeight};\n`;
         cssOutput += `  font-display: ${display};\n`;
-        cssOutput += `  src: url('${baseUrl}/fonts/${encodeURIComponent(file)}') format('${format}');\n`;
+        cssOutput += `  src: url('${fontFileServeUrl}') format('${format}');\n`;
         cssOutput += `  unicode-range: U+0E00-0E7F, U+0000-00FF, U+0100-017F, U+0200-024F, U+0500-052F;\n`;
         cssOutput += `}\n\n`;
       });

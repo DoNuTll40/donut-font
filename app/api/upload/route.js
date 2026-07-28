@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
+import { writeFontFile } from '../../../lib/fontsStorage';
 
 export async function POST(request) {
   try {
@@ -11,11 +11,6 @@ export async function POST(request) {
       return NextResponse.json({ status: 'error', message: 'No font files uploaded' }, { status: 400 });
     }
 
-    const fontsDir = path.join(process.cwd(), 'public', 'fonts');
-    if (!fs.existsSync(fontsDir)) {
-      fs.mkdirSync(fontsDir, { recursive: true });
-    }
-
     let savedFiles = [];
 
     for (const file of files) {
@@ -24,9 +19,8 @@ export async function POST(request) {
         if (['.woff2', '.woff', '.ttf', '.otf'].includes(ext)) {
           const bytes = await file.arrayBuffer();
           const buffer = Buffer.from(bytes);
-          const targetPath = path.join(fontsDir, file.name);
 
-          fs.writeFileSync(targetPath, buffer);
+          writeFontFile(file.name, buffer);
           savedFiles.push(file.name);
         }
       }

@@ -1,47 +1,45 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { getAllFontFiles } from '../../lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const fileName = searchParams.get('file') || '';
   const family = searchParams.get('family') || '';
 
-  const fontsDir = path.join(process.cwd(), 'public', 'fonts');
+  const allFontFiles = getAllFontFiles();
 
   if (fileName) {
-    const requestedPath = path.join(fontsDir, fileName);
-    const ext = path.extname(fileName).toLowerCase();
-
-    // 1. If exact requested file exists, serve it
-    if (fs.existsSync(requestedPath)) {
-      const fileBuffer = fs.readFileSync(requestedPath);
+    const match = allFontFiles.find(f => f.filename === fileName);
+    if (match && fs.existsSync(match.fullPath)) {
+      const fileBuffer = fs.readFileSync(match.fullPath);
+      const ext = path.extname(fileName).toLowerCase();
       const mimeType = ext === '.ttf' ? 'font/ttf' : ext === '.otf' ? 'font/otf' : 'font/woff2';
       return new NextResponse(fileBuffer, {
         headers: {
           'Content-Type': mimeType,
           'Content-Disposition': `attachment; filename="${fileName}"`,
           'Cache-Control': 'public, max-age=31536000, immutable',
+          'Access-Control-Allow-Origin': '*',
         },
       });
     }
 
-    // 2. If woff2 was requested but ttf exists (or vice versa), serve available file
-    if (ext === '.woff2') {
-      const ttfPath = path.join(fontsDir, fileName.replace(/\.woff2$/i, '.ttf'));
-      if (fs.existsSync(ttfPath)) {
-        const fileBuffer = fs.readFileSync(ttfPath);
-        return new NextResponse(fileBuffer, {
-          headers: {
-            'Content-Type': 'font/ttf',
-            'Content-Disposition': `attachment; filename="${fileName.replace(/\.woff2$/i, '.ttf')}"`,
-          },
-        });
-      }
+    // Try matching .ttf if .woff2 requested
+    const altMatch = allFontFiles.find(f => f.filename.toLowerCase() === fileName.replace(/\.woff2$/i, '.ttf').toLowerCase());
+    if (altMatch && fs.existsSync(altMatch.fullPath)) {
+      const fileBuffer = fs.readFileSync(altMatch.fullPath);
+      return new NextResponse(fileBuffer, {
+        headers: {
+          'Content-Type': 'font/ttf',
+          'Content-Disposition': `attachment; filename="${altMatch.filename}"`,
+          'Access-Control-Allow-Origin': '*',
+        },
+      });
     }
   }
 
-  // Fallback demo file generator if file not found
   const targetName = (fileName || family || 'ThaiFont').replace(/[^a-zA-Z0-9_-]/g, '_');
   const dummyBuffer = Buffer.from(`/* Desktop Font File Package for ${targetName} */\n`);
   
