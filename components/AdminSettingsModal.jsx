@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, Trash2, Settings, HardDrive, RefreshCw, ChevronDown, ChevronUp, 
-  CheckCircle2, AlertCircle, UploadCloud, FileType, Sliders, ShieldCheck, Database 
+  CheckCircle2, AlertCircle, UploadCloud, Sliders, Database, ShieldCheck 
 } from 'lucide-react';
 import { useFontContext } from '../context/FontContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +21,7 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
   // File Upload State
   const [selectedUploadFiles, setSelectedUploadFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
 
   // Strict body & html scroll lock
   useEffect(() => {
@@ -65,36 +66,70 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
     setExpandedFamilies((prev) => ({ ...prev, [familyId]: !prev[familyId] }));
   };
 
+  // Upload handler: Uploads files 1-by-1 to stay within Vercel's 4.5MB request payload limit
   const handleUpload = async () => {
     if (selectedUploadFiles.length === 0) return;
 
+    // Check if any single file exceeds Vercel Free Tier limit (4.5 MB)
+    const oversizedFiles = selectedUploadFiles.filter(f => f.size > 4.5 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      setActionStatus({
+        type: 'error',
+        text: `ไฟล์ ${oversizedFiles[0].name} ( ${(oversizedFiles[0].size / (1024 * 1024)).toFixed(2)} MB ) มีขนาดเกินโควตา 4.5 MB ของ Vercel Free Tier! กรุณาเลือกไฟล์ฟอนต์ที่มีขนาดไม่เกิน 4.5 MB`
+      });
+      return;
+    }
+
     setUploading(true);
     setActionStatus(null);
+    let successCount = 0;
+    let failedFiles = [];
 
-    const formData = new FormData();
-    selectedUploadFiles.forEach((file) => {
+    for (let i = 0; i < selectedUploadFiles.length; i++) {
+      const file = selectedUploadFiles[i];
+      setUploadProgress(`กำลังอัปโหลด (${i + 1}/${selectedUploadFiles.length}): ${file.name}`);
+
+      const formData = new FormData();
       formData.append('fonts', file);
-    });
 
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        setActionStatus({ type: 'success', text: `อัปโหลดฟอนต์ใหม่ ${data.files.length} ไฟล์สำเร็จเรียบร้อย!` });
-        setSelectedUploadFiles([]);
-        fetchFontsList();
-        if (onSettingsChanged) onSettingsChanged();
-      } else {
-        setActionStatus({ type: 'error', text: data.message || 'เกิดข้อผิดพลาดในการอัปโหลด' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === 'success') {
+            successCount++;
+          } else {
+            failedFiles.push(file.name);
+          }
+        } else {
+          const errText = await res.text().catch(() => '');
+          failedFiles.push(`${file.name} (${res.status})`);
+        }
+      } catch (err) {
+        failedFiles.push(file.name);
       }
-    } catch (err) {
-      setActionStatus({ type: 'error', text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์อัปโหลดได้' });
-    } finally {
-      setUploading(false);
+    }
+
+    setUploading(false);
+    setUploadProgress('');
+
+    if (successCount > 0) {
+      setActionStatus({
+        type: 'success',
+        text: `อัปโหลดฟอนต์เข้า Vault สำเร็จ ${successCount} จาก ${selectedUploadFiles.length} ไฟล์!`
+      });
+      setSelectedUploadFiles([]);
+      fetchFontsList();
+      if (onSettingsChanged) onSettingsChanged();
+    } else {
+      setActionStatus({
+        type: 'error',
+        text: `ไม่สามารถอัปโหลดไฟล์ได้ (${failedFiles.join(', ')})`
+      });
     }
   };
 
@@ -274,7 +309,7 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
             {/* Action Status Message */}
             {actionStatus && (
               <div
-                className={`mx-6 mt-4 p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+                className={`mx-6 mt-4 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${
                   actionStatus.type === 'success'
                     ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                     : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
@@ -285,7 +320,7 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
                 ) : (
                   <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                 )}
-                <span>{actionStatus.text}</span>
+                <span className="leading-relaxed">{actionStatus.text}</span>
               </div>
             )}
 
@@ -315,7 +350,6 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
                   <div className="space-y-3">
                     {familiesList.map((fam) => {
                       const isExpanded = expandedFamilies[fam.id];
-                      // Clean formatted family name
                       const displayName = fam.name.replace(/[-_]/g, ' ').replace(/\s+/g, ' ');
 
                       return (
@@ -389,7 +423,7 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
                     อัปโหลดไฟล์ฟอนต์เข้าสู่ Private Vault
                   </h4>
                   <p className="text-xs text-zinc-500">
-                    ไฟล์จะถูกจัดเก็บบนเซิร์ฟเวอร์ใน <code>public/fonts/</code> และเปิดให้ใช้งานผ่าน API ทันที
+                    อัปโหลดไฟล์ฟอนต์ <code>.woff2</code>, <code>.ttf</code>, <code>.otf</code> (จำกัดไม่เกิน 4.5 MB ต่อไฟล์ตามโควตา Vercel Free Tier)
                   </p>
                 </div>
 
@@ -418,13 +452,26 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
                       ไฟล์ที่เลือก ({selectedUploadFiles.length})
                     </span>
                     <div className="space-y-1.5 max-h-36 overflow-y-auto scrollbar-none">
-                      {selectedUploadFiles.map((file, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 text-xs">
-                          <span className="font-mono text-zinc-700 dark:text-zinc-300 truncate">{file.name}</span>
-                          <span className="font-mono text-[10px] text-zinc-400 whitespace-nowrap">{(file.size / 1024).toFixed(1)} KB</span>
-                        </div>
-                      ))}
+                      {selectedUploadFiles.map((file, idx) => {
+                        const isTooLarge = file.size > 4.5 * 1024 * 1024;
+                        return (
+                          <div key={idx} className={`flex items-center justify-between p-2.5 rounded-xl text-xs ${isTooLarge ? 'bg-red-500/10 border border-red-500/20' : 'bg-zinc-100 dark:bg-zinc-900'}`}>
+                            <span className={`font-mono truncate ${isTooLarge ? 'text-red-500 font-bold' : 'text-zinc-700 dark:text-zinc-300'}`}>
+                              {file.name} {isTooLarge ? '(ขนาดใหญ่เกิน 4.5 MB)' : ''}
+                            </span>
+                            <span className="font-mono text-[10px] text-zinc-400 whitespace-nowrap">
+                              {(file.size / 1024).toFixed(1)} KB
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
+                  </div>
+                )}
+
+                {uploadProgress && (
+                  <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                    {uploadProgress}
                   </div>
                 )}
 
@@ -452,7 +499,7 @@ export default function AdminSettingsModal({ isOpen, onClose, pinCode, onSetting
                     System Version Controller (ปัจจุบัน: {systemVersion})
                   </h4>
                   <p className="text-xs text-zinc-500 leading-relaxed">
-                    แก้ไขและบันทึกเวอร์ชันระบบ ค่าจะถูกอัปเดตลง <code>data/version.json</code> และ <code>package.json</code> ถาวร
+                    แก้ไขและบันทึกเวอร์ชันระบบ ค่าจะถูกอัปเดตลง <code>data/version.json</code> และ <code>localStorage</code> ถาวร
                   </p>
 
                   <div className="flex items-center gap-3 pt-2">
