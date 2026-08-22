@@ -2,8 +2,16 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check, Sparkles } from 'lucide-react';
-// import { sampleTextPresets } from '../data/fontCatalog';
 import { motion, AnimatePresence } from 'framer-motion';
+const sampleTextPresets = [
+  { label: 'ประโยคภาษาไทยยอดนิยม', text: 'นายเจตน์คนนี้แหละ ชอบพาฝูงผึ้งไปจับปลากินที่เกาะใหญ่อย่างสบายใจ' },
+  { label: 'พยัญชนะไทย ก-ฮ', text: 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮ' },
+  { label: 'สระ และ วรรณยุกต์', text: 'อะ อา อิ อี อึ อือ อุ อู เอ แอ โอ ใอ ไอ อำ ่ ้ ๊ ๋ ์ ็' },
+  { label: 'วรรคทองกวีไทย', text: 'แล้วสอนว่าอย่าไว้ใจมนุษย์ มันแสนสุดลึกล้ำเหลือกำหนด' },
+  { label: 'ฟอนต์พรีเมียมภาษาไทย', text: 'ระบบจัดการและแจกจ่ายฟอนต์ภาษาไทย รองรับทุกอุปกรณ์และเบราว์เซอร์' },
+  { label: 'Alphabet A-Z (English)', text: 'The quick brown fox jumps over the lazy dog' },
+  { label: 'ตัวเลขไทย & อารบิก', text: '0123456789 ๑๒๓๔๕๖๗๘๙๐ ฿ $ € % & *' },
+];
 
 export default function PresetDropdown({ setPreviewText }) {
   const [isOpen, setIsOpen] = useState(false);

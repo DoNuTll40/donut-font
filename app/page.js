@@ -5,11 +5,12 @@ import HeroHeader from '../components/HeroHeader';
 import ControlsBar from '../components/ControlsBar';
 import FontCard from '../components/FontCard';
 import { AlertCircle } from 'lucide-react';
+import { useFontContext } from '../context/FontContext';
 
 export default function Home() {
+  const { previewText, setPreviewText } = useFontContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [previewText, setPreviewText] = useState('เป็นมนุษย์สุดประเสริฐเลิศคุณค่า');
   const [fontSize, setFontSize] = useState(36);
   const [viewMode, setViewMode] = useState('grid');
   const [isGlobalItalic, setIsGlobalItalic] = useState(false);
@@ -45,12 +46,12 @@ export default function Home() {
   });
 
   return (
-    <main className="min-h-screen pb-24 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors">
+    <main className="min-h-screen pb-24 bg-zinc-50 dark:bg-[#0c0d0e] text-zinc-900 dark:text-zinc-100 transition-colors">
       
-      {/* Clean Hero Purpose Section */}
+      {/* Bento Hero Section */}
       <HeroHeader />
 
-      {/* Sticky Controls Bar */}
+      {/* Sticky Bento Controls Bar */}
       <ControlsBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -71,24 +72,24 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <h2 className="font-extrabold text-xl text-zinc-900 dark:text-white tracking-tight">
               Uploaded Private Web Fonts
             </h2>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-              ({filteredFonts.length} families uploaded)
+            <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 dark:bg-[#15171c] border border-zinc-200/80 dark:border-zinc-800 text-xs font-mono font-bold text-zinc-600 dark:text-zinc-400">
+              {filteredFonts.length} families
             </span>
           </div>
         </div>
 
         {filteredFonts.length === 0 ? (
-          <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200 dark:border-zinc-800 space-y-4">
+          <div className="text-center py-20 bg-white dark:bg-[#15171c] rounded-3xl border border-zinc-200/80 dark:border-zinc-800 space-y-4 shadow-xs">
             <AlertCircle className="w-10 h-10 text-zinc-400 mx-auto" />
             <h3 className="font-bold text-zinc-700 dark:text-zinc-300 text-base">
               ยังไม่มีฟอนต์ที่อัปโหลดในระบบ
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
-              ฟอนต์ทั้งหมดจะแสดงผลเฉพาะไฟล์ที่คุณอัปโหลดไว้ใน <code>public/fonts/</code> เท่านั้น คลิกปุ่มตั้งค่าเพื่อเริ่มอัปโหลด
+              ฟอนต์ทั้งหมดจะแสดงผลเฉพาะไฟล์ที่คุณอัปโหลดไว้ในระบบ Private Vault (Neon DB) คลิกปุ่มตั้งค่าเพื่อเริ่มอัปโหลดฟอนต์ของคุณ
             </p>
           </div>
         ) : (

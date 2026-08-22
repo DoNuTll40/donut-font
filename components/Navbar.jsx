@@ -29,12 +29,12 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800/80 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md transition-colors">
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-[#0c0d0e]/80 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
               <Type className="w-5 h-5" />
             </div>
             <div>
@@ -53,7 +53,7 @@ export default function Navbar() {
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+          <nav className="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-[#15171c] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
@@ -61,9 +61,9 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 shadow-xs font-bold'
+                      ? 'bg-white dark:bg-[#1c1f26] text-blue-600 dark:text-blue-400 shadow-2xs font-bold'
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
@@ -80,7 +80,7 @@ export default function Navbar() {
             {/* Admin Settings & Upload Button (PIN Protected) */}
             <button
               onClick={() => setIsPinOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 font-bold text-xs transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-[#15171c] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 font-bold text-xs transition-all shadow-2xs"
               title="Admin Dashboard, Upload Fonts & Settings (PIN Required)"
             >
               <Settings className="w-4 h-4 text-blue-500" />
@@ -88,13 +88,13 @@ export default function Navbar() {
             </button>
 
             {/* Segmented Theme Switcher */}
-            <div className="flex items-center bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center bg-zinc-100 dark:bg-[#15171c] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
               <button
                 onClick={() => setDarkMode(false)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all ${
                   !darkMode
                     ? 'bg-white text-zinc-900 shadow-2xs font-bold'
-                    : 'text-zinc-400 hover:text-zinc-700'
+                    : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
                 }`}
                 title="Light Mode"
               >
@@ -104,10 +104,10 @@ export default function Navbar() {
 
               <button
                 onClick={() => setDarkMode(true)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all ${
                   darkMode
-                    ? 'bg-zinc-800 text-white shadow-2xs font-bold'
-                    : 'text-zinc-500 hover:text-zinc-900'
+                    ? 'bg-[#1c1f26] text-white shadow-2xs font-bold'
+                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                 }`}
                 title="Dark Mode"
               >
@@ -119,7 +119,7 @@ export default function Navbar() {
             {/* Selected Fonts Cart Pill */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs shadow-xs transition-all active:scale-95"
+              className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Get Fonts</span>

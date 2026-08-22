@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllFontFiles, deleteFontFile, saveSystemVersion } from '@/lib/fontsStorage';
+import { getAllFontFiles, deleteFontFile, saveSystemVersion, isFontMatchingFamily } from '@/lib/fontsStorage';
 
 const REQUIRED_PIN = '001140';
 
@@ -15,7 +15,7 @@ export async function POST(request) {
 
     // 1. Delete single file
     if (action === 'delete-file' && filename) {
-      const deleted = deleteFontFile(filename);
+      const deleted = await deleteFontFile(filename);
       if (deleted) {
         return NextResponse.json({ status: 'success', message: `ลบไฟล์ ${filename} เรียบร้อยแล้ว` });
       }
@@ -24,26 +24,13 @@ export async function POST(request) {
 
     // 2. Delete entire family
     if (action === 'delete-family' && familyId) {
-      const allFiles = getAllFontFiles();
-      let deletedCount = 0;
-
-      const normFam = familyId.toLowerCase().replace(/[^a-z0-9]/g, '');
-
-      allFiles.forEach(fileObj => {
-        const normFile = fileObj.filename.toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (normFile.includes(normFam)) {
-          if (deleteFontFile(fileObj.filename)) {
-            deletedCount++;
-          }
-        }
-      });
-
-      return NextResponse.json({ status: 'success', message: `ลบฟอนต์ตระกูลนี้เรียบร้อยแล้ว (${deletedCount} ไฟล์)` });
+      const success = await deleteFontFamily(familyId);
+      return NextResponse.json({ status: 'success', message: `ลบฟอนต์ตระกูลนี้เรียบร้อยแล้ว` });
     }
 
     // 3. Update system version
     if (action === 'update-version' && newVersion) {
-      const savedVersion = saveSystemVersion(newVersion);
+      const savedVersion = await saveSystemVersion(newVersion);
       return NextResponse.json({
         status: 'success',
         version: savedVersion,

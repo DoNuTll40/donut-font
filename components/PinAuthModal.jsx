@@ -9,11 +9,10 @@ export default function PinAuthModal({ isOpen, onClose, onSuccess, title = 'ก�
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Strict body & html scroll lock + Auto-Focus 1st input
+  // Body scroll lock + Auto-Focus 1st input
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
       setPin(['', '', '', '', '', '']);
       setError(false);
       setErrorMessage('');
@@ -24,11 +23,9 @@ export default function PinAuthModal({ isOpen, onClose, onSuccess, title = 'ก�
       }, 50);
     } else {
       document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -86,11 +83,11 @@ export default function PinAuthModal({ isOpen, onClose, onSuccess, title = 'ก�
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="relative z-10 w-full max-w-sm bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden p-6 space-y-6 text-center"
+          className="relative z-10 w-full max-w-sm bg-white dark:bg-[#15171c] rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xl overflow-hidden p-6 space-y-6 text-center"
         >
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="absolute right-4 top-4 p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -118,10 +115,10 @@ export default function PinAuthModal({ isOpen, onClose, onSuccess, title = 'ก�
                   value={digit}
                   onChange={(e) => handleChange(idx, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(idx, e)}
-                  className={`w-10 h-12 text-center text-lg font-mono font-bold rounded-xl border ${
+                  className={`w-10 h-12 text-center text-lg font-mono font-bold rounded-2xl border ${
                     error
                       ? 'border-red-500 bg-red-500/10 text-red-500'
-                      : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30'
+                      : 'border-zinc-200/80 dark:border-zinc-800 bg-zinc-50 dark:bg-[#111215] text-zinc-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 shadow-2xs'
                   } focus:outline-none transition-all`}
                 />
               ))}
@@ -138,13 +135,13 @@ export default function PinAuthModal({ isOpen, onClose, onSuccess, title = 'ก�
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+                className="px-4 py-2 rounded-2xl text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
               >
                 ยกเลิก
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
+                className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
               >
                 ยืนยัน PIN
               </button>

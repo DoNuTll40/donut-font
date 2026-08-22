@@ -1,42 +1,42 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
-import { getAllFontFiles } from '@/lib/fontsStorage';
+import { getFontFileBuffer } from '@/lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const fileName = searchParams.get('file') || '';
   const family = searchParams.get('family') || '';
-
-  const allFontFiles = getAllFontFiles();
+  const isDownload = searchParams.get('download') === '1' || searchParams.get('dl') === '1';
 
   if (fileName) {
-    const match = allFontFiles.find(f => f.filename === fileName);
-    if (match && fs.existsSync(match.fullPath)) {
-      const fileBuffer = fs.readFileSync(match.fullPath);
-      const ext = path.extname(fileName).toLowerCase();
-      const mimeType = ext === '.ttf' ? 'font/ttf' : ext === '.otf' ? 'font/otf' : 'font/woff2';
-      return new NextResponse(fileBuffer, {
-        headers: {
-          'Content-Type': mimeType,
-          'Content-Disposition': `attachment; filename="${fileName}"`,
-          'Cache-Control': 'public, max-age=31536000, immutable',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
+    let fontData = await getFontFileBuffer(fileName);
+
+    // Fallback: try matching .ttf if .woff2 was requested and not found
+    if (!fontData && fileName.toLowerCase().endsWith('.woff2')) {
+      const altName = fileName.replace(/\.woff2$/i, '.ttf');
+      fontData = await getFontFileBuffer(altName);
     }
 
-    // Try matching .ttf if .woff2 requested
-    const altMatch = allFontFiles.find(f => f.filename.toLowerCase() === fileName.replace(/\.woff2$/i, '.ttf').toLowerCase());
-    if (altMatch && fs.existsSync(altMatch.fullPath)) {
-      const fileBuffer = fs.readFileSync(altMatch.fullPath);
-      return new NextResponse(fileBuffer, {
-        headers: {
-          'Content-Type': 'font/ttf',
-          'Content-Disposition': `attachment; filename="${altMatch.filename}"`,
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
+    if (fontData && fontData.buffer) {
+      const ext = path.extname(fontData.filename).toLowerCase();
+      const mimeType =
+        ext === '.ttf' ? 'font/ttf' :
+        ext === '.otf' ? 'font/otf' :
+        ext === '.woff' ? 'font/woff' :
+        'font/woff2';
+
+      const headers = {
+        'Content-Type': mimeType,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      };
+
+      if (isDownload) {
+        headers['Content-Disposition'] = `attachment; filename="${fontData.filename}"`;
+      }
+
+      return new NextResponse(fontData.buffer, { headers });
     }
   }
 

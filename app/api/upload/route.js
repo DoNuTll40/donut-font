@@ -20,7 +20,7 @@ export async function POST(request) {
           const bytes = await file.arrayBuffer();
           const buffer = Buffer.from(bytes);
 
-          writeFontFile(file.name, buffer);
+          await writeFontFile(file.name, buffer);
           savedFiles.push(file.name);
         }
       }

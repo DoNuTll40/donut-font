@@ -1,22 +1,21 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
 import AdmZip from 'adm-zip';
-import { getAllFontFiles, getSystemVersion } from '@/lib/fontsStorage';
+import { getAllFontFiles, getFontFileBuffer, getSystemVersion, isFontMatchingFamily, parseFontFileInfo } from '@/lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const familyParam = searchParams.get('family');
   const familiesParam = searchParams.get('families');
 
-  const allFontFiles = getAllFontFiles();
-  const currentVersion = getSystemVersion();
+  const allFontFiles = await getAllFontFiles();
+  const currentVersion = await getSystemVersion();
   const zip = new AdmZip();
 
   let targetFamilies = [];
   if (familiesParam) {
-    targetFamilies = familiesParam.split(',').map(f => f.trim().toLowerCase());
+    targetFamilies = familiesParam.split(',').map(f => f.trim()).filter(Boolean);
   } else if (familyParam) {
-    targetFamilies = [familyParam.trim().toLowerCase()];
+    targetFamilies = [familyParam.trim()];
   }
 
   let zipFileName = `ThaiFonts_Package_${currentVersion}.zip`;
@@ -25,20 +24,20 @@ export async function GET(request) {
   }
 
   try {
-    allFontFiles.forEach(fileObj => {
+    for (const fileObj of allFontFiles) {
       const file = fileObj.filename;
-      const normFile = file.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const info = parseFontFileInfo(file);
+      if (!info) continue;
 
-      const matches = targetFamilies.length === 0 || targetFamilies.some(fam => {
-        const normFam = fam.replace(/[^a-z0-9]/g, '');
-        return normFile.includes(normFam);
-      });
+      const matches = targetFamilies.length === 0 || targetFamilies.some(fam => isFontMatchingFamily(file, fam));
 
-      if (matches && fs.existsSync(fileObj.fullPath)) {
-        const fileBuffer = fs.readFileSync(fileObj.fullPath);
-        zip.addFile(file, fileBuffer);
+      if (matches) {
+        const fontData = await getFontFileBuffer(file);
+        if (fontData && fontData.buffer) {
+          zip.addFile(file, fontData.buffer);
+        }
       }
-    });
+    }
 
     const zipBuffer = zip.toBuffer();
 
