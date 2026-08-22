@@ -30,10 +30,10 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-[#0c0d0e]/80 backdrop-blur-md transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
             <div className="w-9 h-9 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
               <Type className="w-5 h-5" />
             </div>
@@ -52,8 +52,8 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-[#15171c] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          {/* Navigation Links - Centered Absolutely */}
+          <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-1 bg-zinc-100 dark:bg-[#15171c] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = pathname === link.href;
