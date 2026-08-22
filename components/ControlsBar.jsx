@@ -20,12 +20,12 @@ export default function ControlsBar({
   setIsGlobalItalic,
 }) {
   return (
-    <div className="sticky top-16 z-30 bg-zinc-50/95 dark:bg-[#0c0d0e]/95 border-b border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-md transition-colors py-3">
+    <div className="sticky top-16 z-30 bg-white/80 dark:bg-[#0c0d0e]/80 border-b border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-md transition-colors py-3">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-        
+
         {/* Top Controls Row: Bento Search & Text Inputs */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          
+
           {/* Search Box */}
           <div className="md:col-span-4 relative">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -58,7 +58,7 @@ export default function ControlsBar({
 
         {/* Bottom Filters & Controls Row */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          
+
           {/* Category Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
             <span className="text-xs text-zinc-400 font-semibold mr-1 flex items-center gap-1.5">
@@ -71,11 +71,10 @@ export default function ControlsBar({
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                    isActive
-                      ? 'bg-blue-600 text-white shadow-xs font-bold'
-                      : 'bg-white dark:bg-[#15171c] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800 hover:text-zinc-900 dark:hover:text-white shadow-2xs'
-                  }`}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${isActive
+                    ? 'bg-blue-600 text-white shadow-xs font-bold'
+                    : 'bg-white dark:bg-[#15171c] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800 hover:text-zinc-900 dark:hover:text-white shadow-2xs'
+                    }`}
                 >
                   {cat}
                 </button>
@@ -85,15 +84,14 @@ export default function ControlsBar({
 
           {/* Global Italic Toggle + Size Slider + View Switcher */}
           <div className="flex items-center gap-3">
-            
+
             {/* Global Italic Toggle */}
             <button
               onClick={() => setIsGlobalItalic(!isGlobalItalic)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                isGlobalItalic
-                  ? 'bg-blue-600 text-white shadow-xs font-bold'
-                  : 'bg-white dark:bg-[#15171c] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800 hover:text-zinc-900 dark:hover:text-white shadow-2xs'
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${isGlobalItalic
+                ? 'bg-blue-600 text-white shadow-xs font-bold'
+                : 'bg-white dark:bg-[#15171c] text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-800 hover:text-zinc-900 dark:hover:text-white shadow-2xs'
+                }`}
               title="Toggle Global Italic Font Style"
             >
               <Italic className="w-3.5 h-3.5" />
@@ -119,22 +117,20 @@ export default function ControlsBar({
             <div className="flex items-center bg-white dark:bg-[#15171c] p-1 rounded-xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
-                    : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-                }`}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${viewMode === 'grid'
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
+                  : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
+                  }`}
               >
                 <Grid className="w-3.5 h-3.5" />
                 <span>Grid</span>
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                  viewMode === 'list'
-                    ? 'bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
-                    : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-                }`}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${viewMode === 'list'
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
+                  : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
+                  }`}
               >
                 <LayoutList className="w-3.5 h-3.5" />
                 <span>Row</span>

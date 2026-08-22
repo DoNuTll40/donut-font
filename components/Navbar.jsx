@@ -75,56 +75,40 @@ export default function Navbar() {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 shrink-0">
             
             {/* Admin Settings & Upload Button (PIN Protected) */}
             <button
               onClick={() => setIsPinOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white dark:bg-[#15171c] hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 font-bold text-xs transition-all shadow-2xs"
+              className="p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#15171c] dark:hover:bg-[#1f222a] text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 transition-all shadow-2xs hover:scale-105 active:scale-95 flex items-center justify-center"
               title="Admin Dashboard, Upload Fonts & Settings (PIN Required)"
             >
-              <Settings className="w-4 h-4 text-blue-500" />
-              <span className="hidden sm:inline">Settings &amp; Upload</span>
+              <Settings className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
             </button>
 
-            {/* Segmented Theme Switcher */}
-            <div className="flex items-center bg-zinc-100 dark:bg-[#15171c] p-1 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-2xs">
-              <button
-                onClick={() => setDarkMode(false)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all ${
-                  !darkMode
-                    ? 'bg-white text-zinc-900 shadow-2xs font-bold'
-                    : 'text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-                }`}
-                title="Light Mode"
-              >
-                <Sun className={`w-3.5 h-3.5 ${!darkMode ? 'text-amber-500' : ''}`} />
-                <span className="hidden sm:inline">Light</span>
-              </button>
+            {/* Modern Single-Click Theme Switcher */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200/80 dark:bg-[#15171c] dark:hover:bg-[#1f222a] text-zinc-600 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-800 transition-all shadow-2xs hover:scale-105 active:scale-95 flex items-center justify-center"
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-zinc-700 transition-transform rotate-0 hover:-rotate-12" />
+              )}
+            </button>
 
-              <button
-                onClick={() => setDarkMode(true)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all ${
-                  darkMode
-                    ? 'bg-[#1c1f26] text-white shadow-2xs font-bold'
-                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-                }`}
-                title="Dark Mode"
-              >
-                <Moon className={`w-3.5 h-3.5 ${darkMode ? 'text-blue-400' : ''}`} />
-                <span className="hidden sm:inline">Dark</span>
-              </button>
-            </div>
-
-            {/* Selected Fonts Cart Pill */}
+            {/* Selected Fonts Drawer Pill */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
+              className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
+              title="Open Selected Fonts Drawer"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Get Fonts</span>
+              <ShoppingBag className="w-4 h-4" />
+              <span>Get Fonts</span>
               {selectedFonts.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-white text-blue-600 font-extrabold text-[10px] flex items-center justify-center">
+                <span className="w-5 h-5 rounded-full bg-white text-blue-600 font-extrabold text-[11px] flex items-center justify-center font-mono shadow-xs">
                   {selectedFonts.length}
                 </span>
               )}
