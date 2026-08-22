@@ -54,27 +54,26 @@ export default function FontCard({
       <link rel="stylesheet" href={cssApiUrl} />
 
       <div className="group flex flex-col justify-between rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#15171c] hover:border-zinc-300 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-2xs hover:shadow-md overflow-hidden">
-        
         {/* Card Header */}
-        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-zinc-800/60 space-y-3.5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
+        <div className="p-5 sm:p-6 border-b border-zinc-100 dark:border-zinc-800/60 space-y-3">
+          <div className="flex items-start justify-between gap-2.5">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-lg text-zinc-900 dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h3 className="font-extrabold text-base sm:text-lg text-zinc-900 dark:text-white tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors whitespace-nowrap truncate">
                   {font.name}
                 </h3>
-                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-[#1c1f26] border border-zinc-200/60 dark:border-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wide">
+                <span className="whitespace-nowrap shrink-0 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-[#1c1f26] border border-zinc-200/60 dark:border-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wide">
                   {font.category}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1 truncate">
                 {font.designer} • {font.weights.length} Weights
               </p>
             </div>
 
             <button
               onClick={() => setIsSpecimenOpen(true)}
-              className="p-2 rounded-xl text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 bg-zinc-50 dark:bg-[#1a1c23] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800 transition-colors text-xs font-semibold flex items-center gap-1.5 shadow-2xs"
+              className="shrink-0 p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 bg-zinc-50 dark:bg-[#1a1c23] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800 transition-colors text-xs font-semibold flex items-center gap-1.5 shadow-2xs"
               title="Open Full Font Specimen Modal"
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -82,68 +81,76 @@ export default function FontCard({
             </button>
           </div>
 
-          {/* Weight Selectors Bar */}
-          <div className="space-y-2 pt-1">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              
-              {/* Weights Pills */}
-              <div className="flex flex-wrap items-center gap-1">
-                {font.weights.map((w) => (
-                  <button
-                    key={w}
-                    onClick={() => setSelectedWeight(w)}
-                    className={`px-2.5 py-0.5 rounded-lg text-xs font-mono font-medium transition-all ${
-                      selectedWeight === w
-                        ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold shadow-xs'
-                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-[#1a1c23] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/40 dark:border-zinc-800/60'
-                    }`}
-                  >
-                    {w}
-                  </button>
-                ))}
-              </div>
-
-              {/* Italic & Alignment Controls */}
-              <div className="flex items-center gap-1.5">
+          {/* Weight Selectors Bar & Controls */}
+          <div className="space-y-2.5 pt-0.5">
+            {/* Weights Pills (Clean single row with horizontal overflow) */}
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pb-0.5">
+              {font.weights.map((w) => (
                 <button
-                  onClick={() => setIsItalicMode(!isItalicMode)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    activeItalic
-                      ? 'bg-blue-600 text-white shadow-2xs font-bold'
-                      : 'bg-zinc-50 dark:bg-[#1a1c23] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-zinc-800'
+                  key={w}
+                  onClick={() => setSelectedWeight(w)}
+                  className={`shrink-0 px-2.5 py-0.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                    selectedWeight === w
+                      ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold shadow-xs'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white bg-zinc-50 dark:bg-[#1a1c23] hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/40 dark:border-zinc-800/60'
                   }`}
-                  title="Toggle Italic"
                 >
-                  <Italic className="w-3 h-3" />
-                  <span>Italic</span>
+                  {w}
                 </button>
+              ))}
+            </div>
 
-                {/* Alignment Switcher */}
-                <div className="flex items-center bg-zinc-50 dark:bg-[#1a1c23] p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800">
-                  <button
-                    onClick={() => setTextAlign('left')}
-                    className={`p-1 rounded-md text-xs ${textAlign === 'left' ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs' : 'text-zinc-400'}`}
-                    title="Align Left"
-                  >
-                    <AlignLeft className="w-3 h-3" />
-                  </button>
-                  <button
-                    onClick={() => setTextAlign('center')}
-                    className={`p-1 rounded-md text-xs ${textAlign === 'center' ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs' : 'text-zinc-400'}`}
-                    title="Align Center"
-                  >
-                    <AlignCenter className="w-3 h-3" />
-                  </button>
-                  <button
-                    onClick={() => setTextAlign('right')}
-                    className={`p-1 rounded-md text-xs ${textAlign === 'right' ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs' : 'text-zinc-400'}`}
-                    title="Align Right"
-                  >
-                    <AlignRight className="w-3 h-3" />
-                  </button>
-                </div>
+            {/* Italic & Alignment Controls */}
+            <div className="flex items-center justify-between gap-2 pt-0.5">
+              <button
+                onClick={() => setIsItalicMode(!isItalicMode)}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  activeItalic
+                    ? 'bg-blue-600 text-white shadow-2xs font-bold'
+                    : 'bg-zinc-50 dark:bg-[#1a1c23] text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/60 dark:border-zinc-800'
+                }`}
+                title="Toggle Italic"
+              >
+                <Italic className="w-3 h-3" />
+                <span>Italic</span>
+              </button>
+
+              {/* Alignment Switcher */}
+              <div className="flex items-center bg-zinc-50 dark:bg-[#1a1c23] p-0.5 rounded-lg border border-zinc-200/60 dark:border-zinc-800">
+                <button
+                  onClick={() => setTextAlign('left')}
+                  className={`p-1 rounded-md text-xs transition-colors ${
+                    textAlign === 'left'
+                      ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs'
+                      : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
+                  }`}
+                  title="Align Left"
+                >
+                  <AlignLeft className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => setTextAlign('center')}
+                  className={`p-1 rounded-md text-xs transition-colors ${
+                    textAlign === 'center'
+                      ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs'
+                      : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
+                  }`}
+                  title="Align Center"
+                >
+                  <AlignCenter className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => setTextAlign('right')}
+                  className={`p-1 rounded-md text-xs transition-colors ${
+                    textAlign === 'right'
+                      ? 'bg-white dark:bg-zinc-700 text-blue-600 dark:text-blue-400 shadow-2xs'
+                      : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
+                  }`}
+                  title="Align Right"
+                >
+                  <AlignRight className="w-3 h-3" />
+                </button>
               </div>
-
             </div>
           </div>
         </div>
