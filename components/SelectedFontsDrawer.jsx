@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useFontContext } from '../context/FontContext';
-import { X, Copy, Check, Trash2, Download, Code2, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Copy, Check, Trash2, Download, Code2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SyntaxHighlighter from './SyntaxHighlighter';
 
@@ -32,6 +32,7 @@ export default function SelectedFontsDrawer() {
   const [activeTab, setActiveTab] = useState('import');
   const [copiedTab, setCopiedTab] = useState(null);
   const [expandedFamilies, setExpandedFamilies] = useState({});
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
 
   // Prevent background body scrolling safely without breaking sticky elements
   useEffect(() => {
@@ -78,6 +79,29 @@ export default function SelectedFontsDrawer() {
     setTimeout(() => setCopiedTab(null), 2000);
   };
 
+  const handleDownloadZip = async () => {
+    if (isDownloadingZip || selectedFonts.length === 0) return;
+    setIsDownloadingZip(true);
+    try {
+      const res = await fetch(zipDownloadAllUrl);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ThaiFonts_Selected_${selectedFonts.length}_Families.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์ ZIP');
+    } finally {
+      setIsDownloadingZip(false);
+    }
+  };
+
   const currentSnippet = activeTab === 'link' ? linkSnippet : activeTab === 'import' ? importSnippet : cssRulesSnippet;
 
   return (
@@ -117,19 +141,28 @@ export default function SelectedFontsDrawer() {
                 <div className="flex items-center gap-2">
                   {selectedFonts.length > 0 && (
                     <>
-                      {/* Compact Download .ZIP Button */}
-                      <a
-                        href={zipDownloadAllUrl}
-                        download
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all active:scale-95"
+                      {/* Compact Download .ZIP Button with Active Loading Feedback */}
+                      <button
+                        onClick={handleDownloadZip}
+                        disabled={isDownloadingZip}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-75 disabled:cursor-not-allowed text-white font-bold text-xs shadow-xs transition-all active:scale-95"
                         title={`ดาวน์โหลด ${selectedFonts.length} ตระกูลเป็นไฟล์ .ZIP`}
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>.ZIP</span>
-                        <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
-                          {selectedFonts.length}
-                        </span>
-                      </a>
+                        {isDownloadingZip ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>กำลังสร้าง ZIP...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-3.5 h-3.5" />
+                            <span>.ZIP</span>
+                            <span className="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono">
+                              {selectedFonts.length}
+                            </span>
+                          </>
+                        )}
+                      </button>
 
                       {/* Clear All Trash Button */}
                       <button

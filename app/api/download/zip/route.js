@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import AdmZip from 'adm-zip';
-import { getAllFontFiles, getFontFileBuffer, getSystemVersion, isFontMatchingFamily, parseFontFileInfo } from '@/lib/fontsStorage';
+import { getAllFontFiles, getBatchFontFiles, getSystemVersion, isFontMatchingFamily, parseFontFileInfo } from '@/lib/fontsStorage';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -24,18 +24,23 @@ export async function GET(request) {
   }
 
   try {
+    const matchedFilenames = [];
     for (const fileObj of allFontFiles) {
       const file = fileObj.filename;
       const info = parseFontFileInfo(file);
       if (!info) continue;
 
       const matches = targetFamilies.length === 0 || targetFamilies.some(fam => isFontMatchingFamily(file, fam));
-
       if (matches) {
-        const fontData = await getFontFileBuffer(file);
-        if (fontData && fontData.buffer) {
-          zip.addFile(file, fontData.buffer);
-        }
+        matchedFilenames.push(file);
+      }
+    }
+
+    // Fast Single Batch Query
+    const fontDataList = await getBatchFontFiles(matchedFilenames);
+    for (const fontData of fontDataList) {
+      if (fontData && fontData.buffer) {
+        zip.addFile(fontData.filename, fontData.buffer);
       }
     }
 

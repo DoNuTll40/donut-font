@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFontContext } from '../context/FontContext';
-import { Plus, Check, Download, Italic, Maximize2, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { Plus, Check, Download, Italic, Maximize2, AlignLeft, AlignCenter, AlignRight, Loader2 } from 'lucide-react';
 import FontSpecimenModal from './FontSpecimenModal';
 
 export default function FontCard({
@@ -17,6 +17,7 @@ export default function FontCard({
   const [isItalicMode, setIsItalicMode] = useState(false);
   const [textAlign, setTextAlign] = useState('left');
   const [isSpecimenOpen, setIsSpecimenOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const activeItalic = isGlobalItalic || isItalicMode;
   const isSelected = selectedFonts.some(f => f.id === font.id);
@@ -24,6 +25,29 @@ export default function FontCard({
   const fontFamilyCss = `'${font.name}', sans-serif`;
   const cssApiUrl = `/api/css2?family=${encodeURIComponent(font.name.replace(/\s+/g, '+'))}:wght@${font.weights.join(';')}`;
   const zipDownloadUrl = `/api/download/zip?family=${encodeURIComponent(font.name.replace(/\s+/g, ''))}`;
+
+  const handleDownloadZip = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const res = await fetch(zipDownloadUrl);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${font.name.replace(/\s+/g, '_')}_Fonts.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('เกิดข้อผิดพลาดในการดาวน์โหลดฟอนต์');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <>
@@ -145,15 +169,24 @@ export default function FontCard({
         <div className="px-5 sm:px-6 py-3.5 bg-white dark:bg-[#15171c] border-t border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between gap-2">
           
           {/* Download ZIP Package (.TTF for Windows) */}
-          <a
-            href={zipDownloadUrl}
-            download
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/60 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all shadow-2xs"
+          <button
+            onClick={handleDownloadZip}
+            disabled={isDownloading}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/60 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 disabled:opacity-75 disabled:cursor-not-allowed transition-all shadow-2xs active:scale-95"
             title={`Download all weights & styles of ${font.name} as ZIP (.TTF for Windows)`}
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download All (.ZIP)</span>
-          </a>
+            {isDownloading ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>กำลังเตรียมไฟล์...</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download All (.ZIP)</span>
+              </>
+            )}
+          </button>
 
           {/* Select Font Button */}
           <button

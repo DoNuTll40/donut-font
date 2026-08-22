@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Download, ShieldCheck, Sparkles, Type, Sliders } from 'lucide-react';
+import { X, Download, ShieldCheck, Sparkles, Type, Sliders, Loader2 } from 'lucide-react';
 import { useFontContext } from '../context/FontContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -11,6 +11,7 @@ export default function FontSpecimenModal({ font, isOpen, onClose }) {
   const [isItalic, setIsItalic] = useState(false);
   const [fontSize, setFontSize] = useState(36);
   const [customText, setCustomText] = useState('เป็นมนุษย์สุดประเสริฐเลิศคุณค่า');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Lock document body scroll safely when modal is open
   useEffect(() => {
@@ -29,6 +30,29 @@ export default function FontSpecimenModal({ font, isOpen, onClose }) {
   const fontFamilyCss = `'${font.name}', sans-serif`;
   const cssApiUrl = `/api/css2?family=${encodeURIComponent(font.name.replace(/\s+/g, '+'))}:wght@${font.weights.join(';')}`;
   const zipDownloadUrl = `/api/download/zip?family=${encodeURIComponent(font.name.replace(/\s+/g, ''))}`;
+
+  const handleDownloadZip = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const res = await fetch(zipDownloadUrl);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${font.name.replace(/\s+/g, '_')}_Fonts.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('เกิดข้อผิดพลาดในการดาวน์โหลดฟอนต์');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const thaiConsonants = 'ก ข ค ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ล ว ศ ษ ส ห ฬ อ ฮ';
   const thaiToneMarks = 'ปิ้ ปี้ ปึ้ ปื้ ปุ์ ปู์ ธิ์ ญ์ ผู้ปราชญ์รู้แจ้ง 1234567890';
@@ -68,14 +92,23 @@ export default function FontSpecimenModal({ font, isOpen, onClose }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <a
-                href={zipDownloadUrl}
-                download
-                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-xs active:scale-95"
+              <button
+                onClick={handleDownloadZip}
+                disabled={isDownloading}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-75 disabled:cursor-not-allowed text-white font-bold text-xs transition-all shadow-xs active:scale-95"
               >
-                <Download className="w-4 h-4" />
-                <span>Download .ZIP</span>
-              </a>
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>กำลังเตรียมไฟล์ .ZIP...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    <span>Download .ZIP</span>
+                  </>
+                )}
+              </button>
 
               <button
                 onClick={onClose}
